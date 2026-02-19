@@ -1,0 +1,39 @@
+# Python
+__pycache__
+*.pyc
+*.pyd
+*.pyo
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+
+# Virtual environments
+.venv
+env/
+venv/
+ENV/
+env.bak/
+bin/
+include/
+lib/
+lib64/
+share/
+
+# Environment files
+.env
+.flaskenv
+secrets.json
+
+# IDE files
+.idea/  # For PyCharm/IntelliJ
+.vscode/ # For VS Code (optional, if you have specific user settings to ignore)
+
+# OS generated files
+.DS_Store
+.Trashes
+Thumbs.db
+
+# Database files
+*.sqlite
+*.sqlite3
+test_db.db
