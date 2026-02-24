@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block title %}Поповнення балансу{% endblock %}
+
+{% block content %}
+<div class="hero-shell">
+    <div class="row g-4">
+        <div class="col-lg-7">
+            <h2 class="fw-semibold">Поповнення балансу</h2>
+            <p class="text-muted mb-4">Надішліть оплату на банку Monobank із коментарем, що містить ваше ПІБ.</p>
+
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Реквізити для оплати</h5>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <a href="https://send.monobank.ua/jar/CTHWWHkmC" target="_blank" class="mono-btn">
+                                <i class="fas fa-credit-card"></i> MonoBank
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="text-muted small">Коментар до переказу</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" value="{% if user %}{{ user.full_name }}{% else %}Ваше ПІБ{% endif %}" id="payment-comment" readonly>
+                                <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard('payment-comment')">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="alert alert-info" role="alert">
+                <i class="fas fa-info-circle me-2"></i>
+                <strong>Важливо:</strong> Обов'язково вкажіть ваше ПІБ у коментарі до платежу, інакше прання не зараховуються автоматично.
+            </div>
+
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Тарифи</h5>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="border rounded p-3">
+                                <h6>Звичайний тариф</h6>
+                                <p class="display-6 mb-2">50₴<small class="text-muted fs-6"> / прання</small></p>
+                                <p class="text-muted small mb-0">Стандартна ціна за одне прання</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="border rounded p-3 bg-light">
+                                <h6>З пільгою</h6>
+                                <p class="display-6 mb-2">30₴<small class="text-muted fs-6"> / прання</small></p>
+                                <p class="text-muted small mb-0">Для користувачів з пільгою</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="card card-stats">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Як це працює?</h5>
+                    <div class="d-flex align-items-start mb-3">
+                        <div class="flex-shrink-0">
+                            <span class="chip">1</span>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6>Зробіть переказ</h6>
+                            <p class="text-muted small mb-0">Надішліть кошти на вказану банку Monobank.</p>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-start mb-3">
+                        <div class="flex-shrink-0">
+                            <span class="chip">2</span>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6>Вкажіть ПІБ у коментарі</h6>
+                            <p class="text-muted small mb-0">Система автоматично розпізнає вас і нарахує прання.</p>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-start">
+                        <div class="flex-shrink-0">
+                            <span class="chip">3</span>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6>Бронюйте час</h6>
+                            <p class="text-muted small mb-0">Прання з'являться на вашому балансі протягом кількох хвилин.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center mt-4">
+                <a href="{% if user %}/dashboard{% else %}/login{% endif %}" class="btn btn-brand">
+                    {% if user %}Повернутися на дашборд{% else %}Увійти в систему{% endif %}
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{{ url_for('static', path='js/pricing.js') }}"></script>
+{% endblock %}

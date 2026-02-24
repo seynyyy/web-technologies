@@ -1,0 +1,116 @@
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+}
+
+.calendar-day {
+    aspect-ratio: 1;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.9rem;
+}
+
+.calendar-day:hover:not(.disabled):not(.other-month) {
+    background: #f8f9fa;
+    border-color: var(--ocean);
+}
+
+.calendar-day.selected {
+    background: var(--ocean);
+    color: white;
+    font-weight: 600;
+}
+
+.calendar-day.today {
+    border-color: var(--coral);
+    border-width: 2px;
+}
+
+.calendar-day.disabled {
+    color: #adb5bd;
+    cursor: not-allowed;
+    background: #f8f9fa;
+}
+
+.calendar-day.other-month {
+    color: #ced4da;
+}
+
+.booking-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.booking-table th, 
+.booking-table td {
+    padding: 12px;
+    text-align: center;
+    border: 1px solid #dee2e6;
+}
+
+.booking-table th {
+    background: #f8f9fa;
+    font-weight: 600;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.booking-table td {
+    vertical-align: middle;
+}
+
+.slot-btn {
+    width: 100%;
+    padding: 8px;
+    border: 2px solid #dee2e6;
+    border-radius: 6px;
+    background: white;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.85rem;
+}
+
+.slot-btn.free {
+    border-color: #198754;
+    color: #ffffff;
+    background: #28a745;
+    font-weight: 600;
+}
+
+.slot-btn.free:hover {
+    background: #157347;
+    border-color: #146c43;
+}
+
+.slot-btn.booked {
+    border-color: #adb5bd;
+    color: #495057;
+    background: #e9ecef;
+    cursor: not-allowed;
+    font-weight: 500;
+}
+
+.slot-btn.my-booking {
+    border-color: #dc3545;
+    color: white;
+    background: #ff6b7a;
+    font-weight: 600;
+}
+
+.slot-btn.my-booking:hover {
+    background: #dc3545;
+    border-color: #bb2d3b;
+}
+
+.machine-name {
+    font-weight: 600;
+    background: #f8f9fa;
+}

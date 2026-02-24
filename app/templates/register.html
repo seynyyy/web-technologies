@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}Реєстрація{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center align-items-center" style="min-height: 75vh;">
+    <div class="col-md-7 col-lg-6">
+        <div class="card shadow-lg border-0">
+            <div class="card-body p-5">
+                <div class="text-center">
+                    <span class="chip mb-3"><i class="fas fa-user-plus"></i> Новий обліковий запис</span>
+                    <h3 class="card-title mb-2">Реєстрація</h3>
+                    <p class="text-muted mb-4">Створіть профіль, щоб бронювати прання онлайн.</p>
+                </div>
+
+                {% if error %}
+                <div class="alert alert-danger" role="alert">
+                    {{ error }}
+                </div>
+                {% endif %}
+
+                <form method="post" action="/register">
+                    <div class="mb-3">
+                        <label class="form-label">ПІБ</label>
+                        <input type="text" name="full_name" class="form-control" required value="{{ full_name or '' }}" placeholder="Введіть ваше повне ім'я" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Пароль</label>
+                        <input type="password" name="password" class="form-control" required placeholder="Мінімум 6 символів" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Підтвердити пароль</label>
+                        <input type="password" name="password_confirm" class="form-control" required placeholder="Повторіть пароль" />
+                    </div>
+                    <button type="submit" class="btn btn-brand w-100">Створити акаунт</button>
+                </form>
+
+                <div class="text-center mt-3">
+                    <a href="/login" class="text-decoration-none">Вже є акаунт? Увійти</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{{ url_for('static', path='js/register.js') }}"></script>
+{% endblock %}

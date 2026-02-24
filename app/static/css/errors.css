@@ -1,0 +1,401 @@
+/* ============================================================================
+   LaundryTime - Error Pages Stylesheet
+   Modern error page designs for 404, 401, and other HTTP errors
+   ============================================================================ */
+
+/* ----------------------------------------------------------------------------
+   404 Error Page - Purple gradient theme
+   ---------------------------------------------------------------------------- */
+.error-page-404 {
+    background: linear-gradient(
+        135deg,
+        #667eea 0%,
+        #764ba2 100%
+    );
+    background-attachment: fixed;
+    min-height: 100vh;
+}
+
+/* Add animated gradient */
+.error-page-404::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+        -45deg,
+        rgba(102, 126, 234, 0.8),
+        rgba(118, 75, 162, 0.8),
+        rgba(102, 126, 234, 0.6),
+        rgba(118, 75, 162, 0.6)
+    );
+    background-size: 400% 400%;
+    animation: gradientShift 15s ease infinite;
+    pointer-events: none;
+}
+
+/* ----------------------------------------------------------------------------
+   401 Error Page - Cool gray gradient theme
+   ---------------------------------------------------------------------------- */
+.error-page-401 {
+    background: linear-gradient(
+        135deg,
+        #f5f7fa 0%,
+        #c3cfe2 100%
+    );
+    background-attachment: fixed;
+    min-height: 100vh;
+}
+
+.error-page-401::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+        -45deg,
+        rgba(245, 247, 250, 0.9),
+        rgba(195, 207, 226, 0.9),
+        rgba(245, 247, 250, 0.7),
+        rgba(195, 207, 226, 0.7)
+    );
+    background-size: 400% 400%;
+    animation: gradientShift 15s ease infinite;
+    pointer-events: none;
+}
+
+/* ----------------------------------------------------------------------------
+   Error Code Display - Large, bold numbers
+   ---------------------------------------------------------------------------- */
+.error-code {
+    font-size: clamp(80px, 15vw, 140px);
+    font-weight: 900;
+    line-height: 1;
+    margin-bottom: 1.5rem;
+    text-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    animation: fadeInScale 0.6s ease-out;
+}
+
+.error-page-404 .error-code {
+    color: #fff;
+    text-shadow: 
+        0 0 20px rgba(255, 255, 255, 0.5),
+        0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+.error-page-401 .error-code {
+    color: #ef4444;
+    text-shadow: 
+        0 5px 20px rgba(239, 68, 68, 0.3),
+        0 10px 40px rgba(0, 0, 0, 0.1);
+}
+
+/* ----------------------------------------------------------------------------
+   Error Container - Content wrapper
+   ---------------------------------------------------------------------------- */
+.error-container {
+    position: relative;
+    z-index: 10;
+    padding: 2rem;
+    animation: fadeInUp 0.8s ease-out;
+}
+
+.error-container h1 {
+    font-size: clamp(1.75rem, 4vw, 3rem);
+    font-weight: 800;
+    margin-bottom: 1rem;
+    animation: fadeInUp 0.8s ease-out 0.2s both;
+}
+
+.error-page-404 .error-container h1 {
+    color: #fff;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.error-page-401 .error-container h1 {
+    color: #1f2937;
+}
+
+.error-container .lead {
+    font-size: clamp(1rem, 2vw, 1.25rem);
+    margin-bottom: 2rem;
+    line-height: 1.6;
+    animation: fadeInUp 0.8s ease-out 0.4s both;
+}
+
+.error-page-404 .error-container .lead {
+    color: rgba(255, 255, 255, 0.95);
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.error-page-401 .error-container .lead {
+    color: #4b5563;
+}
+
+/* ----------------------------------------------------------------------------
+   Error Action Buttons - Enhanced styling
+   ---------------------------------------------------------------------------- */
+.error-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    animation: fadeInUp 0.8s ease-out 0.6s both;
+}
+
+.error-page-404 .btn {
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    font-weight: 700;
+    padding: 0.875rem 2rem;
+    font-size: 1.125rem;
+    border-radius: 0.75rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.error-page-404 .btn:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+}
+
+.error-page-404 .btn-light {
+    background: white;
+    color: #667eea;
+    border: none;
+}
+
+.error-page-404 .btn-light:hover {
+    background: #f9fafb;
+    color: #5568d3;
+}
+
+.error-page-404 .btn-outline-light {
+    border: 2px solid white;
+    color: white;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+}
+
+.error-page-404 .btn-outline-light:hover {
+    background: white;
+    color: #667eea;
+}
+
+/* 401 page buttons */
+.error-page-401 .btn {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.error-page-401 .btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* ----------------------------------------------------------------------------
+   Error Footer - Small text at bottom
+   ---------------------------------------------------------------------------- */
+.error-footer {
+    margin-top: 4rem;
+    padding-top: 2rem;
+    animation: fadeIn 1s ease-out 0.8s both;
+}
+
+.error-page-404 .error-footer {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.error-page-401 .error-footer {
+    color: #6b7280;
+}
+
+.error-footer .small {
+    font-size: 0.875rem;
+}
+
+.error-page-404 .error-footer a {
+    color: white;
+    text-decoration: underline;
+    transition: opacity 0.2s;
+}
+
+.error-page-404 .error-footer a:hover {
+    opacity: 0.8;
+}
+
+.error-page-401 .error-footer a {
+    color: #1386a5;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s;
+}
+
+.error-page-401 .error-footer a:hover {
+    color: #0d6b85;
+    text-decoration: underline;
+}
+
+/* ----------------------------------------------------------------------------
+   Decorative Elements - Floating shapes
+   ---------------------------------------------------------------------------- */
+.error-decoration {
+    position: fixed;
+    border-radius: 50%;
+    opacity: 0.1;
+    animation: float 20s ease-in-out infinite;
+    pointer-events: none;
+}
+
+.error-page-404 .error-decoration {
+    background: white;
+}
+
+.error-page-401 .error-decoration {
+    background: #1386a5;
+}
+
+.error-decoration:nth-child(1) {
+    top: 10%;
+    left: 10%;
+    width: 80px;
+    height: 80px;
+    animation-delay: 0s;
+}
+
+.error-decoration:nth-child(2) {
+    top: 60%;
+    left: 80%;
+    width: 120px;
+    height: 120px;
+    animation-delay: 4s;
+}
+
+.error-decoration:nth-child(3) {
+    top: 80%;
+    left: 20%;
+    width: 60px;
+    height: 60px;
+    animation-delay: 2s;
+}
+
+/* ----------------------------------------------------------------------------
+   Animations
+   ---------------------------------------------------------------------------- */
+@keyframes gradientShift {
+    0%, 100% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+}
+
+@keyframes fadeInScale {
+    from {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0) rotate(0deg);
+    }
+    25% {
+        transform: translateY(-20px) rotate(5deg);
+    }
+    50% {
+        transform: translateY(-40px) rotate(0deg);
+    }
+    75% {
+        transform: translateY(-20px) rotate(-5deg);
+    }
+}
+
+/* ----------------------------------------------------------------------------
+   Responsive adjustments
+   ---------------------------------------------------------------------------- */
+@media (max-width: 768px) {
+    .error-code {
+        font-size: 80px;
+    }
+    
+    .error-container {
+        padding: 1.5rem;
+    }
+    
+    .error-actions {
+        flex-direction: column;
+    }
+    
+    .error-actions .btn {
+        width: 100%;
+        max-width: 300px;
+    }
+    
+    .error-footer {
+        margin-top: 3rem;
+    }
+}
+
+/* ----------------------------------------------------------------------------
+   Accessibility - Focus states
+   ---------------------------------------------------------------------------- */
+.error-page-404 .btn:focus,
+.error-page-401 .btn:focus {
+    outline: 3px solid rgba(255, 255, 255, 0.5);
+    outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .error-code {
+        text-shadow: none;
+    }
+    
+    .error-page-404 {
+        background: #5a4a9e;
+    }
+    
+    .error-page-401 {
+        background: #b8c5d9;
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
