@@ -1,0 +1,216 @@
+{% extends "base.html" %}
+
+{% block title %}Редагування профілю{% endblock %}
+
+{% block content %}
+<div class="hero-shell mb-4">
+    <div class="d-flex flex-column flex-lg-row justify-content-between align-items-start align-items-lg-center gap-3">
+        <div>
+            <a href="/dashboard" class="btn btn-sm btn-outline-secondary mb-2"><i class="fas fa-arrow-left"></i> До кабінету</a>
+            <h2 class="fw-semibold">Редагування профілю</h2>
+            <p class="text-muted mb-0">Управління вашим обліковим записом і паролем.</p>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-6">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white border-bottom">
+                <h5 class="mb-0">Основна інформація</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label text-muted small">ПІБ</label>
+                    <p class="display-6 fw-semibold">{{ user.full_name }}</p>
+                </div>
+
+                {% if user.telegram_id %}
+                <div class="mb-3">
+                    <label class="form-label text-muted small">Telegram ID</label>
+                    <p>{{ user.telegram_id }}</p>
+                </div>
+                {% endif %}
+
+                <div class="mb-3">
+                    <label class="form-label text-muted small">Статус</label>
+                    <p>
+                        {% if user.is_active %}
+                        <span class="badge text-bg-success">Активний</span>
+                        {% else %}
+                        <span class="badge text-bg-danger">Деактивований</span>
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white border-bottom">
+                <h5 class="mb-0">Баланс прань</h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-6">
+                        <label class="text-muted small">Доступно прань</label>
+                        <p class="display-6 text-brand fw-semibold">{{ user.washes_left }}</p>
+                    </div>
+                    <div class="col-6">
+                        <label class="text-muted small">Використано цього місяця</label>
+                        <p class="display-6 text-coral fw-semibold">{{ user.washes_used_this_month }}</p>
+                    </div>
+                </div>
+
+                {% if not user.has_discount %}
+                <a href="/pricing" class="btn btn-brand w-100 mt-3">
+                    <i class="fas fa-plus"></i> Поповнити баланс
+                </a>
+                {% else %}
+                <div class="alert alert-success mt-3 mb-0">
+                    <i class="fas fa-star"></i> У вас є особливий бонус!
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mt-1">
+    <div class="col-lg-6">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white border-bottom">
+                <h5 class="mb-0">Змінити ПІБ</h5>
+            </div>
+            <div class="card-body">
+                <form id="update-name-form">
+                    <div class="mb-3">
+                        <label for="new-name" class="form-label">Нове ПІБ</label>
+                        <input type="text" class="form-control form-control-lg" id="new-name" name="full_name" value="{{ user.full_name }}" required>
+                        <small class="text-muted">Це ім'я повинно бути унікальним в системі.</small>
+                    </div>
+                    <div id="name-error" class="alert alert-danger d-none" role="alert"></div>
+                    <button type="submit" class="btn btn-brand w-100">Зберегти ПІБ</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white border-bottom">
+                <h5 class="mb-0">Змінити пароль</h5>
+            </div>
+            <div class="card-body">
+                <form id="change-password-form">
+                    <div class="mb-3">
+                        <label for="current-password" class="form-label">Поточний пароль</label>
+                        <input type="password" class="form-control form-control-lg" id="current-password" name="current_password" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="new-password" class="form-label">Новий пароль</label>
+                        <input type="password" class="form-control form-control-lg" id="new-password" name="new_password" required>
+                        <small class="text-muted">Мінімум 6 символів</small>
+                    </div>
+                    <div class="mb-3">
+                        <label for="confirm-password" class="form-label">Підтвердити новий пароль</label>
+                        <input type="password" class="form-control form-control-lg" id="confirm-password" required>
+                    </div>
+                    <div id="password-error" class="alert alert-danger d-none" role="alert"></div>
+                    <button type="submit" class="btn btn-brand w-100">Змінити пароль</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Update Name Form
+    document.getElementById('update-name-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const token = localStorage.getItem('access_token');
+        const formData = new FormData(e.target);
+        const errorBox = document.getElementById('name-error');
+        errorBox.classList.add('d-none');
+
+        try {
+            const response = await fetch('/auth/update-profile', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                body: formData
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.detail || 'Не вдалося оновити ПІБ');
+            }
+
+            const data = await response.json();
+            localStorage.setItem('access_token', data.access_token);
+            document.cookie = `access_token=${data.access_token}; path=/; max-age=86400`;
+            
+            showToast('ПІБ успішно оновлено', 'success');
+            setTimeout(() => window.location.reload(), 1500);
+        } catch (error) {
+            console.error('Error:', error);
+            errorBox.textContent = error.message;
+            errorBox.classList.remove('d-none');
+            showToast(error.message, 'danger');
+        }
+    });
+
+    // Change Password Form
+    document.getElementById('change-password-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const token = localStorage.getItem('access_token');
+        const newPassword = document.getElementById('new-password').value;
+        const confirmPassword = document.getElementById('confirm-password').value;
+        const errorBox = document.getElementById('password-error');
+        errorBox.classList.add('d-none');
+
+        if (newPassword.length < 6) {
+            errorBox.textContent = 'Новий пароль має містити мінімум 6 символів.';
+            errorBox.classList.remove('d-none');
+            showToast('Пароль має містити мінімум 6 символів', 'danger');
+            return;
+        }
+
+        if (newPassword !== confirmPassword) {
+            errorBox.textContent = 'Паролі не співпадають.';
+            errorBox.classList.remove('d-none');
+            showToast('Паролі не співпадають', 'danger');
+            return;
+        }
+
+        const formData = new FormData(e.target);
+        formData.delete('confirm-password');
+
+        try {
+            const response = await fetch('/auth/change-password', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                body: formData
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.detail || 'Не вдалося змінити пароль');
+            }
+
+            showToast('Пароль успішно змінено', 'success');
+            e.target.reset();
+            errorBox.classList.add('d-none');
+        } catch (error) {
+            console.error('Error:', error);
+            errorBox.textContent = error.message;
+            errorBox.classList.remove('d-none');
+            showToast(error.message, 'danger');
+        }
+    });
+</script>
+{% endblock %}

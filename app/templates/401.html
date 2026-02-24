@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Доступ заборонений{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', path='css/errors.css') }}">
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.body.classList.add('error-page-401');
+    });
+</script>
+{% endblock %}
+
+{% block content %}
+<div style="min-height: 75vh;" class="d-flex align-items-center justify-content-center">
+    <div class="text-center error-container">
+        <div class="error-code">
+            401
+        </div>
+        <h1 class="display-4 fw-bold mb-3">Доступ заборонений</h1>
+        <p class="lead mb-4">
+            Будь ласка, увійдіть у систему.
+        </p>
+        
+        <div class="d-flex gap-3 justify-content-center flex-wrap error-actions">
+            <a href="/login" class="btn btn-brand btn-lg">
+                <i class="fas fa-sign-in-alt"></i> Увійти в систему
+            </a>
+            <a href="/register" class="btn btn-outline-secondary btn-lg">
+                <i class="fas fa-user-plus"></i> Створити акаунт
+            </a>
+        </div>
+
+        <div class="mt-5 pt-5 error-footer">
+            <p class="small">
+                Код помилки: 401 | 
+                <a href="javascript:history.back()" class="text-decoration-none">Повернутися назад</a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

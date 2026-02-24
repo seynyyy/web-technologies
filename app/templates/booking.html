@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+
+{% block title %}Нове бронювання{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', path='css/booking.css') }}">
+{% endblock %}
+
+{% block content %}
+
+<div class="hero-shell">
+    <div class="row g-4">
+        <div class="col-lg-3">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <h6 class="mb-3">Оберіть дату</h6>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <button id="prev-month" class="btn btn-sm btn-outline-secondary">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <h6 class="mb-0" id="current-month"></h6>
+                        <button id="next-month" class="btn btn-sm btn-outline-secondary">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                    <div class="calendar-grid mb-2">
+                        <small class="text-center">Пн</small>
+                        <small class="text-center">Вт</small>
+                        <small class="text-center">Ср</small>
+                        <small class="text-center">Чт</small>
+                        <small class="text-center">Пт</small>
+                        <small class="text-center">Сб</small>
+                        <small class="text-center">Нд</small>
+                    </div>
+                    <div id="calendar-days" class="calendar-grid"></div>
+                    
+                    <hr class="my-3">
+                    
+                    <div class="d-flex flex-column gap-2">
+                        <div class="d-flex align-items-center gap-2">
+                            <div style="width: 20px; height: 20px; background: #28a745; border-radius: 4px;"></div>
+                            <small>Вільно</small>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <div style="width: 20px; height: 20px; background: #ff6b7a; border-radius: 4px;"></div>
+                            <small>Моє бронювання</small>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <div style="width: 20px; height: 20px; background: #e9ecef; border: 2px solid #adb5bd; border-radius: 4px;"></div>
+                            <small>Зайнято</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-9">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Розклад бронювання</h5>
+                    <p class="text-muted mb-4">Оберіть вільний слот для бронювання або натисніть на своє бронювання для скасування</p>
+                    
+                    <div id="loading" class="text-center py-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Завантаження...</span>
+                        </div>
+                    </div>
+                    
+                    <div id="schedule-container" class="d-none">
+                        <div class="table-responsive">
+                            <table class="booking-table">
+                                <thead>
+                                    <tr>
+                                        <th>Машина</th>
+                                        <th>7:00-9:30</th>
+                                        <th>10:00-12:30</th>
+                                        <th>13:00-15:30</th>
+                                        <th>16:00-18:30</th>
+                                        <th>19:00-21:30</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="schedule-body">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div id="no-machines" class="text-center py-5 d-none">
+                        <i class="fas fa-exclamation-circle fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">Немає доступних машин</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Cancel Booking Modal -->
+<div class="modal fade" id="cancelBookingModal" tabindex="-1" aria-labelledby="cancelBookingModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cancelBookingModalLabel">
+                    <i class="fas fa-exclamation-triangle text-warning me-2"></i>
+                    Підтвердження скасування
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-0">Ви впевнені, що хочете скасувати це бронювання?</p>
+                <p class="text-muted small mb-0 mt-2">Цю дію не можна буде скасувати.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i>
+                    Ні, залишити
+                </button>
+                <button type="button" class="btn btn-danger" id="confirmCancelBtn">
+                    <i class="fas fa-check me-1"></i>
+                    Так, скасувати
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{{ url_for('static', path='js/booking.js') }}"></script>
+{% endblock %}

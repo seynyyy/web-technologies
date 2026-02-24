@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block title %}Користувачі - Адмін panель{% endblock %}
+
+{% block content %}
+<div class="hero-shell mb-4">
+    <div class="d-flex flex-column flex-lg-row justify-content-between align-items-start align-items-lg-center gap-3">
+        <div>
+            <a href="/admin" class="btn btn-sm btn-outline-secondary mb-2"><i class="fas fa-arrow-left"></i> Назад</a>
+            <h2 class="fw-semibold">Користувачі</h2>
+            <p class="text-muted mb-0">Управління всіма користувачами системи.</p>
+        </div>
+        <div class="input-group input-group-lg" style="max-width: 300px;">
+            <input type="text" class="form-control" id="search-users" placeholder="Пошук за ПІБ..." />
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm border-0">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table mb-0 align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>ПІБ</th>
+                        <th>Telegram ID</th>
+                        <th>Доступно</th>
+                        <th>Використано</th>
+                        <th>Адмін</th>
+                        <th>Активний</th>
+                        <th>Сповіщення</th>
+                        <th>Дія</th>
+                    </tr>
+                </thead>
+                <tbody id="users-table"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Edit User Modal -->
+<div class="modal fade" id="edit-user-modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Редагувати користувача</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">ПІБ</label>
+                    <input type="text" id="edit-full-name" class="form-control" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Прань доступно</label>
+                    <input type="number" id="edit-washes-left" class="form-control" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Використано цього місяця</label>
+                    <input type="number" id="edit-washes-used" class="form-control" />
+                </div>
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" id="edit-is-admin">
+                    <label class="form-check-label" for="edit-is-admin">Адміністратор</label>
+                </div>
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" id="edit-is-active">
+                    <label class="form-check-label" for="edit-is-active">Активний</label>
+                </div>
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" id="edit-notify">
+                    <label class="form-check-label" for="edit-notify">Отримувати сповіщення</label>
+                </div>
+                <div id="edit-modal-error" class="alert alert-danger d-none" role="alert"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Скасувати</button>
+                <button type="button" class="btn btn-brand" id="save-user-btn">Зберегти</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{{ url_for('static', path='js/admin_users.js') }}"></script>
+{% endblock %}
