@@ -27,7 +27,7 @@ class UserAdminUpdate(BaseModel):
     washes_used_this_month: int | None = None
     is_admin: bool | None = None
     is_active: bool | None = None
-    notify: bool | None = None
+    has_discount: bool | None = None
     
 class UserResponse(UserBase):
     id: int

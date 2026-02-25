@@ -69,6 +69,38 @@
 }
 
 /* ----------------------------------------------------------------------------
+   403 Error Page - Red/Orange gradient theme
+   ---------------------------------------------------------------------------- */
+.error-page-403 {
+    background: linear-gradient(
+        135deg,
+        #fc4a1a 0%,
+        #f7b733 100%
+    );
+    background-attachment: fixed;
+    min-height: 100vh;
+}
+
+.error-page-403::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+        -45deg,
+        rgba(252, 74, 26, 0.8),
+        rgba(247, 183, 51, 0.8),
+        rgba(252, 74, 26, 0.6),
+        rgba(247, 183, 51, 0.6)
+    );
+    background-size: 400% 400%;
+    animation: gradientShift 15s ease infinite;
+    pointer-events: none;
+}
+
+/* ----------------------------------------------------------------------------
    Error Code Display - Large, bold numbers
    ---------------------------------------------------------------------------- */
 .error-code {
@@ -92,6 +124,13 @@
     text-shadow: 
         0 5px 20px rgba(239, 68, 68, 0.3),
         0 10px 40px rgba(0, 0, 0, 0.1);
+}
+
+.error-page-403 .error-code {
+    color: #fff;
+    text-shadow: 
+        0 0 20px rgba(255, 255, 255, 0.5),
+        0 10px 40px rgba(0, 0, 0, 0.3);
 }
 
 /* ----------------------------------------------------------------------------
@@ -120,6 +159,11 @@
     color: #1f2937;
 }
 
+.error-page-403 .error-container h1 {
+    color: #fff;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
 .error-container .lead {
     font-size: clamp(1rem, 2vw, 1.25rem);
     margin-bottom: 2rem;
@@ -134,6 +178,11 @@
 
 .error-page-401 .error-container .lead {
     color: #4b5563;
+}
+
+.error-page-403 .error-container .lead {
+    color: rgba(255, 255, 255, 0.95);
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 /* ----------------------------------------------------------------------------
@@ -195,6 +244,44 @@
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
 }
 
+/* 403 page buttons */
+.error-page-403 .btn {
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    font-weight: 700;
+    padding: 0.875rem 2rem;
+    font-size: 1.125rem;
+    border-radius: 0.75rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.error-page-403 .btn:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+}
+
+.error-page-403 .btn-brand {
+    background: white;
+    color: #fc4a1a;
+    border: none;
+}
+
+.error-page-403 .btn-brand:hover {
+    background: #f9fafb;
+    color: #d93e15;
+}
+
+.error-page-403 .btn-outline-secondary {
+    border: 2px solid white;
+    color: white;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+}
+
+.error-page-403 .btn-outline-secondary:hover {
+    background: white;
+    color: #fc4a1a;
+}
+
 /* ----------------------------------------------------------------------------
    Error Footer - Small text at bottom
    ---------------------------------------------------------------------------- */
@@ -210,6 +297,10 @@
 
 .error-page-401 .error-footer {
     color: #6b7280;
+}
+
+.error-page-403 .error-footer {
+    color: rgba(255, 255, 255, 0.8);
 }
 
 .error-footer .small {
@@ -236,6 +327,16 @@
 .error-page-401 .error-footer a:hover {
     color: #0d6b85;
     text-decoration: underline;
+}
+
+.error-page-403 .error-footer a {
+    color: white;
+    text-decoration: underline;
+    transition: opacity 0.2s;
+}
+
+.error-page-403 .error-footer a:hover {
+    opacity: 0.8;
 }
 
 /* ----------------------------------------------------------------------------

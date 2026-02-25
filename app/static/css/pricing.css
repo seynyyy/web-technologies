@@ -1,0 +1,30 @@
+/* ============================================================================
+   LaundryTime - Pricing Page Stylesheet
+   Styles specific to pricing/payment page
+   ============================================================================ */
+
+/* ----------------------------------------------------------------------------
+   Monobank Button - Payment button styling
+   ---------------------------------------------------------------------------- */
+.mono-btn {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #000000;
+    color: white;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    margin: 16px 0;
+}
+
+.mono-btn:hover {
+    text-decoration: none;
+    color: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.mono-btn i {
+    margin-right: 8px;
+}

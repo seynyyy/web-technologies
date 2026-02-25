@@ -1,6 +1,5 @@
 from dotenv import load_dotenv
 import os
-load_dotenv()
 load_dotenv("app/core/.env")
 
 from datetime import datetime, timedelta, timezone
@@ -36,7 +35,6 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 
 def get_password_hash(password: str) -> str:
     """Хешувати пароль з bcrypt"""
-    # bcrypt може обробляти максимум 72 байти
     salt = bcrypt.gensalt(rounds=12)
     hashed = bcrypt.hashpw(password[:72].encode(), salt)
     return hashed.decode('utf-8')

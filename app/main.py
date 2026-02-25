@@ -49,7 +49,7 @@ app.include_router(pages.router)
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
 
-# Custom 404 and 401 handler
+# Custom 404, 401, and 403 handler
 @app.exception_handler(StarletteHTTPException)
 async def http_exception_handler(request, exc):
     if exc.status_code == 404:
@@ -61,6 +61,11 @@ async def http_exception_handler(request, exc):
         return HTMLResponse(
             content=templates.get_template("401.html").render(request=request),
             status_code=401
+        )
+    elif exc.status_code == 403:
+        return HTMLResponse(
+            content=templates.get_template("403.html").render(request=request),
+            status_code=403
         )
     
     # For all other HTTP exceptions, return JSON response

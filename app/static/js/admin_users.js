@@ -55,7 +55,7 @@ const renderUsers = (users) => {
             <td>${user.washes_used_this_month}</td>
             <td>${user.is_admin ? '<span class="badge text-bg-warning">Так</span>' : '<span class="text-muted">Ні</span>'}</td>
             <td>${user.is_active ? '<span class="badge text-bg-success">Так</span>' : '<span class="badge text-bg-danger">Ні</span>'}</td>
-            <td>${user.notify ? '<span class="badge text-bg-success">Так</span>' : '<span class="badge text-bg-secondary">Ні</span>'}</td>
+            <td>${user.has_discount ? '<span class="badge text-bg-info">Так</span>' : '<span class="text-muted">Ні</span>'}</td>
             <td>
                 <button class="btn btn-sm btn-outline-primary" data-edit-user="${user.id}">Редагувати</button>
             </td>
@@ -71,7 +71,7 @@ const openEditModal = (user) => {
     document.getElementById('edit-washes-used').value = user.washes_used_this_month;
     document.getElementById('edit-is-admin').checked = user.is_admin;
     document.getElementById('edit-is-active').checked = user.is_active;
-    document.getElementById('edit-notify').checked = user.notify;
+    document.getElementById('edit-has-discount').checked = user.has_discount;
     document.getElementById('edit-modal-error').classList.add('d-none');
     
     if (!editUserModal) {
@@ -89,7 +89,7 @@ const saveUser = async () => {
         washes_used_this_month: Number(document.getElementById('edit-washes-used').value),
         is_admin: document.getElementById('edit-is-admin').checked,
         is_active: document.getElementById('edit-is-active').checked,
-        notify: document.getElementById('edit-notify').checked
+        has_discount: document.getElementById('edit-has-discount').checked
     };
 
     if (!updates.full_name) {
