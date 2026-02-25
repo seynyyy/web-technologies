@@ -2,6 +2,10 @@
 
 {% block title %}Поповнення балансу{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', path='css/pricing.css') }}">
+{% endblock %}
+
 {% block content %}
 <div class="hero-shell">
     <div class="row g-4">

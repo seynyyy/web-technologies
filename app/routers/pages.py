@@ -13,10 +13,8 @@ from app.services import user_service
 
 logger = logging.getLogger(__name__)
 
-# Створюємо роутер
 router = APIRouter(tags=["Веб-сторінки"])
 
-# Вказуємо шлях до папки з шаблонами
 templates = Jinja2Templates(directory="app/templates")
 
 @router.get("/", include_in_schema=False)
@@ -46,12 +44,11 @@ async def read_dashboard(
 ):
     """Головна сторінка користувача"""
     
-    # Отримуємо активні бронювання для таблиці (тільки майбутні дати)
     active_bookings = db.query(Booking).options(
         joinedload(Booking.machine)
     ).filter(
         Booking.user_id == current_user.id,
-        Booking.date > date.today()
+        Booking.date >= date.today()
     ).order_by(Booking.date.asc()).all()
 
     return templates.TemplateResponse("dashboard.html", {

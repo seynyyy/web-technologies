@@ -73,6 +73,7 @@ This is the root directory for all application code.
   * `admin_bookings.html` - Admin booking management
   * `admin_users.html` - Admin user management
   * `401.html` - Unauthorized error page
+  * `403.html` - Forbidden error page
   * `404.html` - Not found error page
 
 ### Root Level Files

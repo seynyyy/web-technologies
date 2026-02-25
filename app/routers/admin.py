@@ -71,7 +71,6 @@ def update_user(user_id: int, payload: UserAdminUpdate, db: Session = Depends(ge
     update_data = payload.model_dump(exclude_unset=True)
     
     if "full_name" in update_data and update_data["full_name"]:
-        # Перевірити унікальність
         existing = db.query(User).filter(User.full_name == update_data["full_name"], User.id != user_id).first()
         if existing:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="ПІБ вже використовується")
@@ -89,8 +88,8 @@ def update_user(user_id: int, payload: UserAdminUpdate, db: Session = Depends(ge
     if "is_active" in update_data:
         user.is_active = update_data["is_active"]
     
-    if "notify" in update_data:
-        user.notify = update_data["notify"]
+    if "has_discount" in update_data:
+        user.has_discount = update_data["has_discount"]
     
     db.commit()
     db.refresh(user)
