@@ -6,11 +6,13 @@ class UserBase(BaseModel):
     id: int
     full_name: str
     telegram_id: Optional[int] = None
+    notify: Optional[bool] = False
     
 class UserCreate(BaseModel):
     full_name: str
     password: str
     telegram_id: Optional[int] = None
+    notify: Optional[bool] = False
     
 class UserRead(UserBase):
     pass
@@ -19,6 +21,7 @@ class UserUpdate(BaseModel):
     full_name: str | None = None
     password: str | None = None
     telegram_id: int | None = None
+    notify: bool | None = None
 
 class UserAdminUpdate(BaseModel):
     """Схема для оновлення користувача адміністратором"""

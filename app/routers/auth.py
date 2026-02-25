@@ -6,7 +6,8 @@ from pydantic import BaseModel
 from app.db.database import get_db
 from app.models.user import User
 from app.core.security import verify_password, create_access_token, verify_telegram_data, get_current_user, get_password_hash
-from app.schemas.user import TelegramLoginData
+from app.schemas.user import TelegramLoginData, UserCreate, UserResponse
+from app.services import user_service
 
 router = APIRouter(prefix="/auth", tags=["Авторизація"])
 
@@ -30,6 +31,47 @@ def login_for_access_token(
     access_token = create_access_token(data={"sub": user.full_name})
     
     return {"access_token": access_token, "token_type": "bearer"}
+
+
+@router.post("/register")
+def register_user(
+    full_name: str = Form(...),
+    password: str = Form(...),
+    password_confirm: str = Form(...),
+    db: Session = Depends(get_db)
+):
+    if password != password_confirm:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Паролі не збігаються"
+        )
+    
+    if len(password) < 6:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Пароль має містити мінімум 6 символів"
+        )
+    
+    user_in = UserCreate(full_name=full_name, password=password, telegram_id=None, notify=False)
+    
+    try:
+        user = user_service.create_user(db, user_in)
+        access_token = create_access_token(data={"sub": user.full_name})
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e) or "Не вдалося зареєструвати користувача"
+        ) from e
+    
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "user": {
+            "id": user.id,
+            "full_name": user.full_name,
+            "telegram_id": user.telegram_id
+        }
+    }
 
 
 @router.post("/login/telegram")
