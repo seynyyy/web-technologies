@@ -22,14 +22,16 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
     }
 
     try {
-        const formData = new FormData();
-        formData.append('full_name', fullName);
-        formData.append('password', password);
-        formData.append('password_confirm', passwordConfirm);
-
         const response = await fetch('/auth/register', {
             method: 'POST',
-            body: formData
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                full_name: fullName,
+                password: password,
+                password_confirm: passwordConfirm
+            })
         });
 
         const data = await response.json();

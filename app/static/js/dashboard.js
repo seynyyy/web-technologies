@@ -32,8 +32,8 @@ document.querySelectorAll('[data-booking-id]').forEach((button) => {
 // Dashboard: Update Name Form
 document.getElementById('update-name-form').addEventListener('submit', async (e) => {
     e.preventDefault();
-    const token = localStorage.getItem('access_token');
-    const formData = new FormData(e.target);
+    const token = localStorage.getItem('access_token'); 
+    const fullName = document.getElementById('new-name').value.trim();
     const errorBox = document.getElementById('name-error');
     errorBox.classList.add('d-none');
 
@@ -41,9 +41,10 @@ document.getElementById('update-name-form').addEventListener('submit', async (e)
         const response = await fetch('/auth/update-profile', {
             method: 'POST',
             headers: {
+                'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
             },
-            body: formData
+            body: JSON.stringify({ full_name: fullName })
         });
 
         if (!response.ok) {
@@ -69,6 +70,7 @@ document.getElementById('update-name-form').addEventListener('submit', async (e)
 document.getElementById('change-password-form').addEventListener('submit', async (e) => {
     e.preventDefault();
     const token = localStorage.getItem('access_token');
+    const currentPassword = document.getElementById('current-password').value;
     const newPassword = document.getElementById('new-password').value;
     const confirmPassword = document.getElementById('confirm-password').value;
     const errorBox = document.getElementById('password-error');
@@ -88,16 +90,17 @@ document.getElementById('change-password-form').addEventListener('submit', async
         return;
     }
 
-    const formData = new FormData(e.target);
-    formData.delete('confirm-password');
-
     try {
         const response = await fetch('/auth/change-password', {
             method: 'POST',
             headers: {
+                'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
             },
-            body: formData
+            body: JSON.stringify({
+                current_password: currentPassword,
+                new_password: newPassword
+            })
         });
 
         if (!response.ok) {

@@ -24,8 +24,6 @@ def create_new_booking(
     Створити нове бронювання.
     Перевіряє ліміти прань, доступність слота та планує відправку повідомлень у Telegram.
     """
-    # Вся складна логіка (включно зі збереженням завдань у планувальник)
-    # тепер надійно захована у нашому сервісі!
     booking = booking_service.create_booking(
         db=db, 
         booking_in=booking_in, 
@@ -43,8 +41,6 @@ def get_my_bookings(
     Отримати список усіх бронювань поточного користувача.
     Корисно для відображення історії в особистому кабінеті.
     """
-    # Оскільки запит дуже простий, можемо зробити його прямо тут,
-    # або винести в booking_service.get_user_bookings(db, current_user.id)
     bookings = db.query(Booking).filter(
         Booking.user_id == current_user.id
     ).order_by(Booking.date.desc()).all()

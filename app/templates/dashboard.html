@@ -3,32 +3,38 @@
 {% block title %}Мій кабінет{% endblock %}
 
 {% block content %}
-<div class="hero-shell mb-4">
-    <div class="row g-4 align-items-center">
+<div class="mb-4">
+    <div class="row g-4">
         <div class="col-lg-5">
-            <div class="card card-stats">
+            <div class="card shadow-sm border-0">
                 <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-start mb-2">
-                        <span class="chip"><i class="fas fa-bolt"></i> Поточний баланс</span>
-                        <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="collapse" data-bs-target="#profile-section" aria-expanded="false" aria-controls="profile-section">
-                            <i class="fas fa-edit"></i> Профіль
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="mb-0 text-muted small"><i class="fas fa-wallet"></i> ПОТОЧНИЙ БАЛАНС</h6>
+                        <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="collapse" data-bs-target="#profile-section">
+                            <i class="fas fa-cog"></i> Налаштування
                         </button>
                     </div>
-                    <h2 class="card-title mt-3 display-6">{{ user.washes_left }} прань</h2>
-                    <p class="card-text text-muted">Використано в цьому місяці: {{ user.washes_used_this_month }}</p>
-                    <a href="/pricing" class="btn btn-sm btn-coral">Поповнити баланс</a>
+                    <h2 class="display-5 fw-bold mb-2">{{ user.washes_left }}</h2>
+                    <p class="text-muted small mb-3">прань залишилось</p>
+                    <p class="text-muted small mb-3">Використано: <strong>{{ user.washes_used_this_month }}</strong> цього місяця</p>
+                    <a href="/pricing" class="btn btn-brand w-100">
+                        <i class="fas fa-plus-circle"></i> Поповнити баланс
+                    </a>
                 </div>
             </div>
         </div>
 
         <div class="col-lg-7">
-            <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
-                <div>
-                    <h3 class="fw-semibold">Заплануйте наступне прання</h3>
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body d-flex flex-column justify-content-between">
+                    <div>
+                        <h5 class="fw-semibold mb-2"><i class="fas fa-calendar-alt"></i> Заплануйте наступне прання</h5>
+                        <p class="text-muted small">Виберіть зручний час та заберіть чисту білизну</p>
+                    </div>
+                    <a href="/booking" class="btn btn-brand btn-lg w-100 mt-3">
+                        <i class="fas fa-plus"></i> Забронювати час
+                    </a>
                 </div>
-                <a href="/booking" class="btn btn-brand btn-lg">
-                    <i class="fas fa-plus"></i> Забронювати час
-                </a>
             </div>
         </div>
     </div>
