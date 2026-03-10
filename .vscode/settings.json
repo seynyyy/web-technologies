@@ -17,9 +17,14 @@
         },
         {
             "previewLimit": 50,
-            "driver": "SQLite",
-            "database": "${workspaceFolder:wt}/laundry.db",
-            "name": "laundry_db"
+            "driver": "PostgreSQL",
+            "server": "localhost",
+            "port": 5432,
+            "database": "laundry",
+            "username": "postgres",
+            "password": "password",
+            "name": "laundry_db",
+            "askForPassword": true
         }
     ],
     "sqltools.useNodeRuntime": true

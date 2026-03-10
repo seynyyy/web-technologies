@@ -19,7 +19,18 @@ const fetchJson = async (url, options = {}) => {
         ...options
     });
     if (!response.ok) {
-        throw new Error('Помилка запиту');
+        let errorMessage = 'Помилка запиту';
+
+        try {
+            const errorData = await response.json();
+            if (typeof errorData?.detail === 'string') {
+                errorMessage = errorData.detail;
+            }
+        } catch (error) {
+            console.error('Failed to parse error response:', error);
+        }
+
+        throw new Error(errorMessage);
     }
     if (response.status === 204) {
         return null;
@@ -41,14 +52,16 @@ const renderMachines = (machines) => {
     machines.forEach((machine) => {
         const row = document.createElement('tr');
         row.innerHTML = `
-            <td>${machine.id}</td>
-            <td><input class="form-control form-control-sm" value="${machine.name}" data-machine-name="${machine.id}"></td>
-            <td>
+            <td data-label="ID">${machine.id}</td>
+            <td data-label="Назва"><input class="form-control form-control-sm" value="${machine.name}" data-machine-name="${machine.id}"></td>
+            <td data-label="Активна">
                 <input type="checkbox" class="form-check-input" ${machine.is_active ? 'checked' : ''} data-machine-active="${machine.id}">
             </td>
-            <td>
-                <button class="btn btn-sm btn-outline-primary" data-save-machine="${machine.id}">Зберегти</button>
-                <button class="btn btn-sm btn-outline-danger" data-delete-machine="${machine.id}">Видалити</button>
+            <td data-label="Дії">
+                <div class="admin-actions">
+                    <button class="btn btn-sm btn-outline-primary" data-save-machine="${machine.id}">Зберегти</button>
+                    <button class="btn btn-sm btn-outline-danger" data-delete-machine="${machine.id}">Видалити</button>
+                </div>
             </td>
         `;
         table.appendChild(row);
@@ -67,13 +80,13 @@ const loadUsers = async () => {
     users.forEach((user) => {
         const row = document.createElement('tr');
         row.innerHTML = `
-            <td>${user.id}</td>
-            <td>${user.full_name}</td>
-            <td>${user.washes_left}</td>
-            <td>${user.washes_used_this_month}</td>
-            <td>${user.is_admin ? 'Так' : 'Ні'}</td>
-            <td>
-                <div class="input-group input-group-sm">
+            <td data-label="ID">${user.id}</td>
+            <td data-label="ПІБ">${user.full_name}</td>
+            <td data-label="Прань доступно">${user.washes_left}</td>
+            <td data-label="Використано">${user.washes_used_this_month}</td>
+            <td data-label="Адмін">${user.is_admin ? 'Так' : 'Ні'}</td>
+            <td data-label="Корекція">
+                <div class="input-group input-group-sm admin-adjust-group">
                     <input type="number" class="form-control" placeholder="+/-" data-user-delta="${user.id}">
                     <button class="btn btn-outline-secondary" data-user-apply="${user.id}">Застосувати</button>
                 </div>
@@ -97,12 +110,12 @@ const loadBookings = async () => {
     bookings.forEach((booking) => {
         const row = document.createElement('tr');
         row.innerHTML = `
-            <td>${booking.id}</td>
-            <td>${booking.user_full_name || 'N/A'}</td>
-            <td>${booking.machine_id}</td>
-            <td>${booking.date}</td>
-            <td>${booking.time_slot}</td>
-            <td>${booking.created_at}</td>
+            <td data-label="ID">${booking.id}</td>
+            <td data-label="Користувач">${booking.user_full_name || 'N/A'}</td>
+            <td data-label="Пральна машина">${booking.machine_id}</td>
+            <td data-label="Дата">${booking.date}</td>
+            <td data-label="Час">${booking.time_slot}</td>
+            <td data-label="Створено">${booking.created_at}</td>
         `;
         table.appendChild(row);
     });
@@ -130,17 +143,23 @@ document.getElementById('save-machine').addEventListener('click', async () => {
     }
 
     errorBox.classList.add('d-none');
-    await fetchJson('/admin-api/machines', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ name, is_active: isActive })
-    });
 
-    machineModal.hide();
-    await loadMachines();
-    await loadStats();
+    try {
+        await fetchJson('/admin-api/machines', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ name, is_active: isActive })
+        });
+
+        machineModal.hide();
+        await loadMachines();
+        await loadStats();
+    } catch (error) {
+        errorBox.textContent = error.message;
+        errorBox.classList.remove('d-none');
+    }
 });
 
 document.getElementById('machines-table').addEventListener('click', async (event) => {
@@ -232,10 +251,10 @@ async function loadSchedulerJobs() {
             const nextRun = job.next_run_time ? new Date(job.next_run_time).toLocaleString('uk-UA') : 'N/A';
             
             row.innerHTML = `
-                <td><code class="small">${job.id}</code></td>
-                <td><small>${job.func}</small></td>
-                <td>${nextRun}</td>
-                <td><small>${job.args}</small></td>
+                <td data-label="Job ID"><code class="small">${job.id}</code></td>
+                <td data-label="Function"><small>${job.func}</small></td>
+                <td data-label="Next Run">${nextRun}</td>
+                <td data-label="Args"><small>${job.args}</small></td>
             `;
             table.appendChild(row);
         });

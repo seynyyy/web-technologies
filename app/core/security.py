@@ -1,6 +1,6 @@
 from dotenv import load_dotenv
 import os
-load_dotenv("app/core/.env")
+load_dotenv()
 
 from datetime import datetime, timedelta, timezone
 import hashlib

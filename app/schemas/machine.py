@@ -2,7 +2,6 @@ from pydantic import BaseModel, ConfigDict
 from typing import Optional
 
 class MachineBase(BaseModel):
-    id: int
     name: str
     is_active: bool = True
 
