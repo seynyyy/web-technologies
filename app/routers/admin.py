@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.orm import Session, joinedload
 from datetime import date
+import logging
 from app.db.database import get_db
 from app.core.security import get_current_admin
 from app.core import scheduler as scheduler_module
@@ -10,6 +11,21 @@ from app.models.machine import WashingMachine
 from app.models.booking import Booking
 from app.schemas.machine import MachineCreate, MachineUpdate, MachineResponse
 from app.schemas.user import UserAdminUpdate
+
+audit_logger = logging.getLogger("app.audit.admin")
+
+
+def log_admin_action(admin: User, action: str, target: str, target_id: int | None = None, details: dict | None = None):
+    """Write structured admin audit logs for traceability."""
+    audit_logger.info(
+        "ADMIN_ACTION action=%s admin_id=%s admin_name=%s target=%s target_id=%s details=%s",
+        action,
+        admin.id,
+        admin.full_name,
+        target,
+        target_id,
+        details or {},
+    )
 
 router = APIRouter(
     prefix="/admin-api",
@@ -52,21 +68,42 @@ def list_users(db: Session = Depends(get_db)):
     ]
 
 @router.post("/users/{user_id}/adjust-washes")
-def adjust_washes(user_id: int, delta: int, db: Session = Depends(get_db)):
+def adjust_washes(user_id: int, delta: int, db: Session = Depends(get_db), current_admin: User = Depends(get_current_admin)):
     """Додати або відняти прання вручну"""
     user = db.get(User, user_id)
     if user is None:
+        log_admin_action(current_admin, "adjust_washes_failed", "user", user_id, {"delta": delta, "reason": "user_not_found"})
         return {"status": "error", "message": "User not found"}
+
+    previous_balance = user.washes_left
     user.washes_left += delta
     db.commit()
+
+    log_admin_action(
+        current_admin,
+        "adjust_washes",
+        "user",
+        user_id,
+        {
+            "delta": delta,
+            "previous_washes_left": previous_balance,
+            "new_washes_left": user.washes_left,
+        },
+    )
     return {"status": "success", "new_balance": user.washes_left}
 
 
 @router.patch("/users/{user_id}")
-def update_user(user_id: int, payload: UserAdminUpdate, db: Session = Depends(get_db)):
+def update_user(
+    user_id: int,
+    payload: UserAdminUpdate,
+    db: Session = Depends(get_db),
+    current_admin: User = Depends(get_current_admin),
+):
     """Оновити дані користувача"""
     user = db.get(User, user_id)
     if user is None:
+        log_admin_action(current_admin, "update_user_failed", "user", user_id, {"reason": "user_not_found"})
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 
     update_data = payload.model_dump(exclude_unset=True)
@@ -94,6 +131,9 @@ def update_user(user_id: int, payload: UserAdminUpdate, db: Session = Depends(ge
     
     db.commit()
     db.refresh(user)
+
+    log_admin_action(current_admin, "update_user", "user", user_id, {"updated_fields": list(update_data.keys())})
+
     return {
         "id": user.id,
         "full_name": user.full_name,
@@ -114,19 +154,36 @@ def list_machines(db: Session = Depends(get_db)):
 
 
 @router.post("/machines", status_code=status.HTTP_201_CREATED, response_model=MachineResponse)
-def create_machine(payload: MachineCreate, db: Session = Depends(get_db)):
+def create_machine(payload: MachineCreate, db: Session = Depends(get_db), current_admin: User = Depends(get_current_admin)):
     machine = WashingMachine(name=payload.name, is_active=payload.is_active)
     db.add(machine)
     db.commit()
     db.refresh(machine)
+
+    log_admin_action(
+        current_admin,
+        "create_machine",
+        "machine",
+        machine.id,
+        {"name": machine.name, "is_active": machine.is_active},
+    )
+
     return MachineResponse.model_validate(machine)
 
 
 @router.patch("/machines/{machine_id}", response_model=MachineResponse)
-def update_machine(machine_id: int, payload: MachineUpdate, db: Session = Depends(get_db)):
+def update_machine(
+    machine_id: int,
+    payload: MachineUpdate,
+    db: Session = Depends(get_db),
+    current_admin: User = Depends(get_current_admin),
+):
     machine = db.get(WashingMachine, machine_id)
     if machine is None:
+        log_admin_action(current_admin, "update_machine_failed", "machine", machine_id, {"reason": "machine_not_found"})
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Machine not found")
+
+    old_values = {"name": machine.name, "is_active": machine.is_active}
 
     if payload.name is not None:
         machine.name = payload.name
@@ -135,17 +192,34 @@ def update_machine(machine_id: int, payload: MachineUpdate, db: Session = Depend
 
     db.commit()
     db.refresh(machine)
+
+    log_admin_action(
+        current_admin,
+        "update_machine",
+        "machine",
+        machine_id,
+        {
+            "old": old_values,
+            "new": {"name": machine.name, "is_active": machine.is_active},
+        },
+    )
+
     return MachineResponse.model_validate(machine)
 
 
 @router.delete("/machines/{machine_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_machine(machine_id: int, db: Session = Depends(get_db)):
+def delete_machine(machine_id: int, db: Session = Depends(get_db), current_admin: User = Depends(get_current_admin)):
     machine = db.get(WashingMachine, machine_id)
     if machine is None:
+        log_admin_action(current_admin, "delete_machine_failed", "machine", machine_id, {"reason": "machine_not_found"})
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Machine not found")
 
+    deleted_snapshot = {"name": machine.name, "is_active": machine.is_active}
     db.delete(machine)
     db.commit()
+
+    log_admin_action(current_admin, "delete_machine", "machine", machine_id, deleted_snapshot)
+
     return None
 
 
@@ -192,21 +266,32 @@ def list_bookings(
 
 
 @router.delete("/bookings/{booking_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_booking(booking_id: int, db: Session = Depends(get_db)):
+def delete_booking(booking_id: int, db: Session = Depends(get_db), current_admin: User = Depends(get_current_admin)):
     """Видалити бронювання"""
     booking = db.get(Booking, booking_id)
     if booking is None:
+        log_admin_action(current_admin, "delete_booking_failed", "booking", booking_id, {"reason": "booking_not_found"})
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Booking not found")
 
+    deleted_snapshot = {
+        "user_id": booking.user_id,
+        "machine_id": booking.machine_id,
+        "date": str(booking.date),
+        "time_slot": booking.time_slot.value,
+    }
     db.delete(booking)
     db.commit()
+
+    log_admin_action(current_admin, "delete_booking", "booking", booking_id, deleted_snapshot)
+
     return None
 
 
 @router.get("/scheduler/jobs")
-def get_scheduler_jobs():
+def get_scheduler_jobs(current_admin: User = Depends(get_current_admin)):
     """Debug endpoint: показує всі заплановані завдання в scheduler"""
     if not scheduler_module.scheduler:
+        log_admin_action(current_admin, "view_scheduler_jobs", "scheduler", details={"status": "not_initialized"})
         return {
             "status": "error",
             "message": "Scheduler not initialized",
@@ -215,7 +300,7 @@ def get_scheduler_jobs():
     
     jobs = scheduler_module.scheduler.get_jobs()
     
-    return {
+    result = {
         "status": "ok",
         "scheduler_running": scheduler_module.scheduler.running,
         "total_jobs": len(jobs),
@@ -232,3 +317,7 @@ def get_scheduler_jobs():
             for job in jobs
         ]
     }
+
+    log_admin_action(current_admin, "view_scheduler_jobs", "scheduler", details={"total_jobs": len(jobs)})
+
+    return result
