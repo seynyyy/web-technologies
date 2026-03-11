@@ -25,8 +25,8 @@ share/
 secrets.json
 
 # IDE files
-.idea/  # For PyCharm/IntelliJ
-.vscode/ # For VS Code (optional, if you have specific user settings to ignore)
+.idea/  
+.vscode/ 
 
 # OS generated files
 .DS_Store
