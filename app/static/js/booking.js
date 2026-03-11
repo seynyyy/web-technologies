@@ -45,6 +45,16 @@ let machines = [];
 let myBookings = [];
 
 // Calendar functions
+function updateScheduleDate() {
+    const dateEl = document.getElementById('schedule-date');
+    if (dateEl) {
+        const day = String(selectedDate.getDate()).padStart(2, '0');
+        const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
+        const year = selectedDate.getFullYear();
+        dateEl.textContent = `(${day}.${month}.${year})`;
+    }
+}
+
 function renderCalendar() {
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
@@ -80,7 +90,12 @@ function renderCalendar() {
         date.setHours(0, 0, 0, 0);
         const isDisabled = date < today;
         const isToday = date.getTime() === today.getTime();
-        const isSelected = date.getTime() === selectedDate.getTime();
+        
+        // Normalize selectedDate for comparison
+        const selectedDateNormalized = new Date(selectedDate);
+        selectedDateNormalized.setHours(0, 0, 0, 0);
+        const isSelected = date.getTime() === selectedDateNormalized.getTime();
+        
         const dayEl = createDayElement(day, false, date, isDisabled, isToday, isSelected);
         calendarDays.appendChild(dayEl);
     }
@@ -108,6 +123,7 @@ function createDayElement(day, otherMonth, date, disabled = false, today = false
             selectedDate = new Date(date);
             selectedDate.setHours(12, 0, 0, 0); // Set to noon to avoid timezone issues
             renderCalendar();
+            updateScheduleDate();
             loadSchedule();
         });
     }
@@ -195,6 +211,7 @@ async function loadSchedule() {
             // Slot cells
             TIME_SLOTS.forEach(slot => {
                 const cell = document.createElement('td');
+                cell.setAttribute('data-time-slot', slot);
                 const slotData = schedule.find(s => s.time_slot === slot);
                 
                 if (slotData) {
@@ -223,6 +240,8 @@ async function loadSchedule() {
                     
                     cell.appendChild(button);
                 } else {
+                    // Hide empty slots on mobile
+                    cell.classList.add('empty-slot');
                     cell.textContent = '-';
                 }
                 
@@ -308,6 +327,7 @@ async function confirmCancelBooking() {
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
     renderCalendar();
+    updateScheduleDate();
     loadMachines();
     
     // Set up cancel booking confirmation handler

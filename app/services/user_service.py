@@ -9,8 +9,10 @@ def get_user_by_username(db: Session, full_name: str):
     """Шукає користувача за його логіном"""
     return db.query(User).filter(User.full_name == full_name).first()
 
-def get_user_by_telegram(db: Session, telegram_id: int):
+def get_user_by_telegram(db: Session, telegram_id: int | None):
     """Шукає користувача за Telegram ID"""
+    if telegram_id is None:
+        return None
     return db.query(User).filter(User.telegram_id == telegram_id).first()
 
 def create_user(db: Session, user_in: UserCreate):
@@ -27,13 +29,18 @@ def create_user(db: Session, user_in: UserCreate):
     
     hashed_password = get_password_hash(user_in.password)
     
+    existing_telegram_user = get_user_by_telegram(db, telegram_id=user_in.telegram_id)
+    if existing_telegram_user:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Користувач з таким Telegram ID вже існує"
+        )
     telegram = user_in.telegram_id
         
     db_user = User(
         full_name=user_in.full_name,
         telegram_id=telegram,
         hashed_password=hashed_password,
-        
         washes_left=0,
         washes_used_this_month=0,
         has_discount=False,
@@ -49,7 +56,7 @@ def create_user(db: Session, user_in: UserCreate):
 def reset_monthly_washes(db: Session, user: User):
     """
     Обнуляє лічильник прань за місяць. 
-    Раніше це був метод `reset_monthly_washes` у вашій моделі Django.
+
     """
     db.query(User).filter(User.id == user.id).update({User.washes_used_this_month: 0})
     db.commit()

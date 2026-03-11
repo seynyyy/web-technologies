@@ -6,15 +6,16 @@ passwordForm.addEventListener('submit', async (event) => {
     event.preventDefault();
     passwordError.classList.add('d-none');
     const formData = new FormData(passwordForm);
-    const params = new URLSearchParams(formData);
+    const username = formData.get('username');
+    const password = formData.get('password');
 
     try {
         const response = await fetch('/auth/login', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
+                'Content-Type': 'application/json'
             },
-            body: params
+            body: JSON.stringify({ username, password })
         });
 
         if (!response.ok) {

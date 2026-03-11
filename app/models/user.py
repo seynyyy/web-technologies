@@ -18,7 +18,7 @@ class User(Base):
     washes_left: Mapped[int] = mapped_column(default=0)
     washes_used_this_month: Mapped[int] = mapped_column(default=0)
     has_discount: Mapped[bool] = mapped_column(default=False)
-    notify: Mapped[bool] = mapped_column(default=True)
+    notify: Mapped[bool] = mapped_column(default=False)
 
     bookings: Mapped[list["Booking"]] = relationship("Booking", back_populates="user")
 

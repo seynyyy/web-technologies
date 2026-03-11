@@ -16,6 +16,10 @@ logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
+
+logging.getLogger("httpx").setLevel(logging.WARNING)
+logging.getLogger("httpcore").setLevel(logging.WARNING)
+
 logger = logging.getLogger(__name__)
 
 templates = Jinja2Templates(directory="app/templates")
@@ -49,7 +53,6 @@ app.include_router(pages.router)
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
 
-# Custom 404, 401, and 403 handler
 @app.exception_handler(StarletteHTTPException)
 async def http_exception_handler(request, exc):
     if exc.status_code == 404:
@@ -68,7 +71,6 @@ async def http_exception_handler(request, exc):
             status_code=403
         )
     
-    # For all other HTTP exceptions, return JSON response
     return JSONResponse(
         status_code=exc.status_code,
         content={"detail": exc.detail}

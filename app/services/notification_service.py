@@ -39,7 +39,7 @@ async def send_telegram_message(telegram_id: int, text: str) -> bool:
 async def send_start_notification(telegram_id: int, machine_name: str):
     """Відправляється, коли настає час прання"""
     logger.info(f"🎯 START NOTIFICATION triggered for telegram_id={telegram_id}, machine={machine_name}")
-    message = f"🧺 <b>Час прання почався!</b>\n\nМашинка: <b>{machine_name}</b>\n\nВаше прання почалося. Очікуваний час завершення: ~1 година."
+    message = f"🧺 <b>Час прання почався!</b>\n\Пральна машина: <b>{machine_name}</b>\n\nПочався час для прання."
     result = await send_telegram_message(telegram_id, message)
     logger.info(f"   Result: {'✅ Success' if result else '❌ Failed'}")
     return result
@@ -48,7 +48,7 @@ async def send_start_notification(telegram_id: int, machine_name: str):
 async def send_end_notification(telegram_id: int, machine_name: str):
     """Відправляється наприкінці прання"""
     logger.info(f"🎯 END NOTIFICATION triggered for telegram_id={telegram_id}, machine={machine_name}")
-    message = f"✅ <b>Прання завершено!</b>\n\nМашинка: <b>{machine_name}</b>\n\nБудь ласка, заберіть ваші речі протягом 15 хвилин."
+    message = f"✅ <b>Прання завершено!</b>\n\nПральна машина: <b>{machine_name}</b>\n\nБудь ласка, заберіть ваші речі протягом 15 хвилин."
     result = await send_telegram_message(telegram_id, message)
     logger.info(f"   Result: {'✅ Success' if result else '❌ Failed'}")
     return result

@@ -1,12 +1,19 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Form
-from fastapi.security import OAuth2PasswordRequestForm
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 
 from app.db.database import get_db
 from app.models.user import User
 from app.core.security import verify_password, create_access_token, verify_telegram_data, get_current_user, get_password_hash
-from app.schemas.user import TelegramLoginData
+from app.schemas.user import (
+    AuthChangePasswordRequest,
+    AuthLoginRequest,
+    AuthRegisterRequest,
+    AuthUpdateProfileRequest,
+    TelegramLoginData,
+    UserCreate
+)
+from app.services import user_service
 
 router = APIRouter(prefix="/auth", tags=["Авторизація"])
 
@@ -15,12 +22,12 @@ class NotificationSettings(BaseModel):
 
 @router.post("/login")
 def login_for_access_token(
-    form_data: OAuth2PasswordRequestForm = Depends(), 
+    payload: AuthLoginRequest,
     db: Session = Depends(get_db)
 ):
-    user = db.query(User).filter(User.full_name == form_data.username).first()
+    user = db.query(User).filter(User.full_name == payload.username).first()
     
-    if not user or not user.hashed_password or not verify_password(form_data.password, user.hashed_password):
+    if not user or not user.hashed_password or not verify_password(payload.password, user.hashed_password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Невірний логін або пароль",
@@ -30,6 +37,50 @@ def login_for_access_token(
     access_token = create_access_token(data={"sub": user.full_name})
     
     return {"access_token": access_token, "token_type": "bearer"}
+
+
+@router.post("/register")
+def register_user(
+    payload: AuthRegisterRequest,
+    db: Session = Depends(get_db)
+):
+    if payload.password != payload.password_confirm:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Паролі не збігаються"
+        )
+    
+    if len(payload.password) < 6:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Пароль має містити мінімум 6 символів"
+        )
+    
+    user_in = UserCreate(
+        full_name=payload.full_name,
+        password=payload.password,
+        telegram_id=None,
+        notify=payload.notify
+    )
+    
+    try:
+        user = user_service.create_user(db, user_in)
+        access_token = create_access_token(data={"sub": user.full_name})
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e) or "Не вдалося зареєструвати користувача"
+        ) from e
+    
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "user": {
+            "id": user.id,
+            "full_name": user.full_name,
+            "telegram_id": user.telegram_id
+        }
+    }
 
 
 @router.post("/login/telegram")
@@ -81,36 +132,38 @@ def login_with_telegram(
 
 @router.post("/change-password")
 def change_password(
-    current_password: str = Form(...),
-    new_password: str = Form(...),
+    payload: AuthChangePasswordRequest,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    if not current_user.hashed_password or not verify_password(current_password, current_user.hashed_password):
+    if not current_user.hashed_password or not verify_password(payload.current_password, current_user.hashed_password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Невірний поточний пароль"
         )
     
-    current_user.hashed_password = get_password_hash(new_password)
+    current_user.hashed_password = get_password_hash(payload.new_password)
     db.commit()
     return {"status": "success", "message": "Пароль успішно змінено"}
 
 
 @router.post("/update-profile")
 def update_profile(
-    full_name: str = Form(...),
+    payload: AuthUpdateProfileRequest,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    existing = db.query(User).filter(User.full_name == full_name, User.id != current_user.id).first()
+    existing = db.query(User).filter(
+        User.full_name == payload.full_name,
+        User.id != current_user.id
+    ).first()
     if existing:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Це ім'я вже використовується іншим користувачем"
         )
     
-    current_user.full_name = full_name
+    current_user.full_name = payload.full_name
     db.commit()
     
     access_token = create_access_token(data={"sub": current_user.full_name})
@@ -124,7 +177,6 @@ def link_telegram(
     current_user: User = Depends(get_current_user)
 ):
     """Приєднати Telegram акаунт до профілю через автентифікацію"""
-    # Verify telegram data
     data = payload.model_dump()
     if not verify_telegram_data(data.copy()):
         raise HTTPException(
@@ -132,7 +184,6 @@ def link_telegram(
             detail="Невірні дані Telegram"
         )
     
-    # Check if telegram_id is already linked to another user
     existing = db.query(User).filter(User.telegram_id == payload.id, User.id != current_user.id).first()
     if existing:
         raise HTTPException(

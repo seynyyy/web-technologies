@@ -13,6 +13,7 @@ from apscheduler.jobstores.base import JobLookupError
 logger = logging.getLogger(__name__)
 
 MAX_WASHES_PER_MONTH = 12
+NOTIFICATION_MISFIRE_GRACE_SECONDS = 60
 
 def calculate_start_time(booking_date: date, time_slot) -> datetime:
     """Calculate the start datetime from booking date and time slot."""
@@ -101,7 +102,8 @@ def create_booking(db: Session, booking_in: BookingCreate, user: User):
                 run_date=start_datetime, 
                 args=[user.telegram_id, machine.name], 
                 id=start_job_id,               
-                replace_existing=True    
+                replace_existing=True,
+                misfire_grace_time=NOTIFICATION_MISFIRE_GRACE_SECONDS
             )
             logger.info(f"✅ Start job added: {start_job_id}")
         except Exception as e:
@@ -114,7 +116,8 @@ def create_booking(db: Session, booking_in: BookingCreate, user: User):
                 run_date=end_datetime, 
                 args=[user.telegram_id, machine.name], 
                 id=end_job_id, 
-                replace_existing=True
+                replace_existing=True,
+                misfire_grace_time=NOTIFICATION_MISFIRE_GRACE_SECONDS
             )
             logger.info(f"✅ End job added: {end_job_id}")
         except Exception as e:

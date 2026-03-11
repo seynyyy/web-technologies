@@ -1,3 +1,4 @@
+from fastapi import Form
 from pydantic import BaseModel, ConfigDict
 from typing import Optional
 
@@ -6,11 +7,68 @@ class UserBase(BaseModel):
     id: int
     full_name: str
     telegram_id: Optional[int] = None
+    notify: Optional[bool] = False
     
 class UserCreate(BaseModel):
     full_name: str
     password: str
     telegram_id: Optional[int] = None
+    notify: Optional[bool] = False
+
+
+class AuthLoginRequest(BaseModel):
+    username: str
+    password: str
+
+    @classmethod
+    def as_form(
+        cls,
+        username: str = Form(...),
+        password: str = Form(...)
+    ) -> "AuthLoginRequest":
+        return cls(username=username, password=password)
+
+
+class AuthRegisterRequest(BaseModel):
+    full_name: str
+    password: str
+    password_confirm: str
+    notify: Optional[bool] = False
+
+    @classmethod
+    def as_form(
+        cls,
+        full_name: str = Form(...),
+        password: str = Form(...),
+        password_confirm: str = Form(...)
+    ) -> "AuthRegisterRequest":
+        return cls(
+            full_name=full_name,
+            password=password,
+            password_confirm=password_confirm,
+            notify=False
+        )
+
+
+class AuthChangePasswordRequest(BaseModel):
+    current_password: str
+    new_password: str
+
+    @classmethod
+    def as_form(
+        cls,
+        current_password: str = Form(...),
+        new_password: str = Form(...)
+    ) -> "AuthChangePasswordRequest":
+        return cls(current_password=current_password, new_password=new_password)
+
+
+class AuthUpdateProfileRequest(BaseModel):
+    full_name: str
+
+    @classmethod
+    def as_form(cls, full_name: str = Form(...)) -> "AuthUpdateProfileRequest":
+        return cls(full_name=full_name)
     
 class UserRead(UserBase):
     pass
@@ -19,6 +77,7 @@ class UserUpdate(BaseModel):
     full_name: str | None = None
     password: str | None = None
     telegram_id: int | None = None
+    notify: bool | None = None
 
 class UserAdminUpdate(BaseModel):
     """Схема для оновлення користувача адміністратором"""

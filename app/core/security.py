@@ -1,6 +1,6 @@
 from dotenv import load_dotenv
 import os
-load_dotenv("app/core/.env")
+load_dotenv()
 
 from datetime import datetime, timedelta, timezone
 import hashlib
@@ -27,7 +27,7 @@ SECRET_KEY: str = _SECRET_KEY
 TELEGRAM_BOT_TOKEN: str = _TELEGRAM_BOT_TOKEN
 
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+ACCESS_TOKEN_EXPIRE_MINUTES = 120
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     """Перевірити пароль проти хешу"""

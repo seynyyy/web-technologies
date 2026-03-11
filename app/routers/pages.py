@@ -1,17 +1,12 @@
-from fastapi import APIRouter, Request, Depends, Form
+from fastapi import APIRouter, Request, Depends
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session, joinedload
 from datetime import date
-import logging
 
 from app.db.database import get_db
 from app.models.booking import Booking
-from app.core.security import get_current_user, get_current_admin # Функція для перевірки авторизації
-from app.schemas.user import UserCreate
-from app.services import user_service
-
-logger = logging.getLogger(__name__)
+from app.core.security import get_current_user, get_current_admin
 
 router = APIRouter(tags=["Веб-сторінки"])
 
@@ -103,41 +98,3 @@ async def pricing_page(request: Request):
 async def register_page(request: Request):
     """Сторінка реєстрації"""
     return templates.TemplateResponse("register.html", {"request": request})
-
-
-@router.post("/register", response_class=HTMLResponse)
-async def register_user(
-    request: Request,
-    full_name: str = Form(...),
-    password: str = Form(...),
-    password_confirm: str = Form(...),
-    db: Session = Depends(get_db)
-):
-    if password != password_confirm:
-        return templates.TemplateResponse(
-            "register.html",
-            {"request": request, "error": "Паролі не збігаються", "full_name": full_name}
-        )
-    
-    if len(password) < 6:
-        return templates.TemplateResponse(
-            "register.html",
-            {"request": request, "error": "Пароль має містити мінімум 6 символів", "full_name": full_name}
-        )
-    
-    user_in = UserCreate(full_name=full_name, password=password, telegram_id=None)
-
-    try:
-        user_service.create_user(db, user_in)
-    except Exception as exc:
-        logger.error(f"Помилка реєстрації для {full_name}: {str(exc)}", exc_info=True)
-        error_message = getattr(exc, "detail", str(exc))
-        if not error_message or error_message == "":
-            error_message = "Не вдалося зареєструвати користувача"
-        return templates.TemplateResponse(
-            "register.html",
-            {"request": request, "error": error_message, "full_name": full_name}
-        )
-
-    return RedirectResponse(url="/login", status_code=302)
-
